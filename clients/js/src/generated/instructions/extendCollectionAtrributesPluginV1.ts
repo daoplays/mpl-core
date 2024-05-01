@@ -25,17 +25,10 @@ import {
   ResolvedAccountsWithIndices,
   getAccountMetasAndSigners,
 } from '../shared';
-import {
-  PluginAuthority,
-  PluginAuthorityArgs,
-  PluginType,
-  PluginTypeArgs,
-  getPluginAuthoritySerializer,
-  getPluginTypeSerializer,
-} from '../types';
+import { Attribute, AttributeArgs, getAttributeSerializer } from '../types';
 
 // Accounts.
-export type ApproveCollectionPluginAuthorityV1InstructionAccounts = {
+export type ExtendCollectionAtrributesPluginV1InstructionAccounts = {
   /** The address of the asset */
   collection: PublicKey | Pda;
   /** The account paying for the storage fees */
@@ -49,50 +42,47 @@ export type ApproveCollectionPluginAuthorityV1InstructionAccounts = {
 };
 
 // Data.
-export type ApproveCollectionPluginAuthorityV1InstructionData = {
+export type ExtendCollectionAtrributesPluginV1InstructionData = {
   discriminator: number;
-  pluginType: PluginType;
-  newAuthority: PluginAuthority;
+  attribute: Attribute;
 };
 
-export type ApproveCollectionPluginAuthorityV1InstructionDataArgs = {
-  pluginType: PluginTypeArgs;
-  newAuthority: PluginAuthorityArgs;
+export type ExtendCollectionAtrributesPluginV1InstructionDataArgs = {
+  attribute: AttributeArgs;
 };
 
-export function getApproveCollectionPluginAuthorityV1InstructionDataSerializer(): Serializer<
-  ApproveCollectionPluginAuthorityV1InstructionDataArgs,
-  ApproveCollectionPluginAuthorityV1InstructionData
+export function getExtendCollectionAtrributesPluginV1InstructionDataSerializer(): Serializer<
+  ExtendCollectionAtrributesPluginV1InstructionDataArgs,
+  ExtendCollectionAtrributesPluginV1InstructionData
 > {
   return mapSerializer<
-    ApproveCollectionPluginAuthorityV1InstructionDataArgs,
+    ExtendCollectionAtrributesPluginV1InstructionDataArgs,
     any,
-    ApproveCollectionPluginAuthorityV1InstructionData
+    ExtendCollectionAtrributesPluginV1InstructionData
   >(
-    struct<ApproveCollectionPluginAuthorityV1InstructionData>(
+    struct<ExtendCollectionAtrributesPluginV1InstructionData>(
       [
         ['discriminator', u8()],
-        ['pluginType', getPluginTypeSerializer()],
-        ['newAuthority', getPluginAuthoritySerializer()],
+        ['attribute', getAttributeSerializer()],
       ],
-      { description: 'ApproveCollectionPluginAuthorityV1InstructionData' }
+      { description: 'ExtendCollectionAtrributesPluginV1InstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 10 })
+    (value) => ({ ...value, discriminator: 8 })
   ) as Serializer<
-    ApproveCollectionPluginAuthorityV1InstructionDataArgs,
-    ApproveCollectionPluginAuthorityV1InstructionData
+    ExtendCollectionAtrributesPluginV1InstructionDataArgs,
+    ExtendCollectionAtrributesPluginV1InstructionData
   >;
 }
 
 // Args.
-export type ApproveCollectionPluginAuthorityV1InstructionArgs =
-  ApproveCollectionPluginAuthorityV1InstructionDataArgs;
+export type ExtendCollectionAtrributesPluginV1InstructionArgs =
+  ExtendCollectionAtrributesPluginV1InstructionDataArgs;
 
 // Instruction.
-export function approveCollectionPluginAuthorityV1(
+export function extendCollectionAtrributesPluginV1(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: ApproveCollectionPluginAuthorityV1InstructionAccounts &
-    ApproveCollectionPluginAuthorityV1InstructionArgs
+  input: ExtendCollectionAtrributesPluginV1InstructionAccounts &
+    ExtendCollectionAtrributesPluginV1InstructionArgs
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -130,7 +120,7 @@ export function approveCollectionPluginAuthorityV1(
   } satisfies ResolvedAccountsWithIndices;
 
   // Arguments.
-  const resolvedArgs: ApproveCollectionPluginAuthorityV1InstructionArgs = {
+  const resolvedArgs: ExtendCollectionAtrributesPluginV1InstructionArgs = {
     ...input,
   };
 
@@ -160,8 +150,8 @@ export function approveCollectionPluginAuthorityV1(
 
   // Data.
   const data =
-    getApproveCollectionPluginAuthorityV1InstructionDataSerializer().serialize(
-      resolvedArgs as ApproveCollectionPluginAuthorityV1InstructionDataArgs
+    getExtendCollectionAtrributesPluginV1InstructionDataSerializer().serialize(
+      resolvedArgs as ExtendCollectionAtrributesPluginV1InstructionDataArgs
     );
 
   // Bytes Created On Chain.

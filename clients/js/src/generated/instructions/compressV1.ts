@@ -59,7 +59,7 @@ export function getCompressV1InstructionDataSerializer(): Serializer<
     struct<CompressV1InstructionData>([['discriminator', u8()]], {
       description: 'CompressV1InstructionData',
     }),
-    (value) => ({ ...value, discriminator: 17 })
+    (value) => ({ ...value, discriminator: 18 })
   ) as Serializer<CompressV1InstructionDataArgs, CompressV1InstructionData>;
 }
 

@@ -102,7 +102,7 @@ pub struct RevokePluginAuthorityV1InstructionData {
 
 impl RevokePluginAuthorityV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 10 }
+        Self { discriminator: 11 }
     }
 }
 

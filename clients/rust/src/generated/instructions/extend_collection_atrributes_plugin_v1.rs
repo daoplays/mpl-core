@@ -5,39 +5,38 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
+use crate::generated::types::Attribute;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct UpdateCollectionV1 {
+pub struct ExtendCollectionAtrributesPluginV1 {
     /// The address of the asset
     pub collection: solana_program::pubkey::Pubkey,
     /// The account paying for the storage fees
     pub payer: solana_program::pubkey::Pubkey,
-    /// The update authority or update authority delegate of the asset
+    /// The owner or delegate of the asset
     pub authority: Option<solana_program::pubkey::Pubkey>,
-    /// The new update authority of the asset
-    pub new_update_authority: Option<solana_program::pubkey::Pubkey>,
     /// The system program
     pub system_program: solana_program::pubkey::Pubkey,
     /// The SPL Noop Program
     pub log_wrapper: Option<solana_program::pubkey::Pubkey>,
 }
 
-impl UpdateCollectionV1 {
+impl ExtendCollectionAtrributesPluginV1 {
     pub fn instruction(
         &self,
-        args: UpdateCollectionV1InstructionArgs,
+        args: ExtendCollectionAtrributesPluginV1InstructionArgs,
     ) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: UpdateCollectionV1InstructionArgs,
+        args: ExtendCollectionAtrributesPluginV1InstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.collection,
             false,
@@ -48,17 +47,6 @@ impl UpdateCollectionV1 {
         if let Some(authority) = self.authority {
             accounts.push(solana_program::instruction::AccountMeta::new_readonly(
                 authority, true,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MPL_CORE_ID,
-                false,
-            ));
-        }
-        if let Some(new_update_authority) = self.new_update_authority {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                new_update_authority,
-                false,
             ));
         } else {
             accounts.push(solana_program::instruction::AccountMeta::new_readonly(
@@ -82,7 +70,7 @@ impl UpdateCollectionV1 {
             ));
         }
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = UpdateCollectionV1InstructionData::new()
+        let mut data = ExtendCollectionAtrributesPluginV1InstructionData::new()
             .try_to_vec()
             .unwrap();
         let mut args = args.try_to_vec().unwrap();
@@ -97,47 +85,43 @@ impl UpdateCollectionV1 {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-pub struct UpdateCollectionV1InstructionData {
+pub struct ExtendCollectionAtrributesPluginV1InstructionData {
     discriminator: u8,
 }
 
-impl UpdateCollectionV1InstructionData {
+impl ExtendCollectionAtrributesPluginV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 17 }
+        Self { discriminator: 8 }
     }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UpdateCollectionV1InstructionArgs {
-    pub new_name: Option<String>,
-    pub new_uri: Option<String>,
+pub struct ExtendCollectionAtrributesPluginV1InstructionArgs {
+    pub attribute: Attribute,
 }
 
-/// Instruction builder for `UpdateCollectionV1`.
+/// Instruction builder for `ExtendCollectionAtrributesPluginV1`.
 ///
 /// ### Accounts:
 ///
 ///   0. `[writable]` collection
 ///   1. `[writable, signer]` payer
 ///   2. `[signer, optional]` authority
-///   3. `[optional]` new_update_authority
-///   4. `[optional]` system_program (default to `11111111111111111111111111111111`)
-///   5. `[optional]` log_wrapper
+///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
+///   4. `[optional]` log_wrapper
 #[derive(Default)]
-pub struct UpdateCollectionV1Builder {
+pub struct ExtendCollectionAtrributesPluginV1Builder {
     collection: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
-    new_update_authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
     log_wrapper: Option<solana_program::pubkey::Pubkey>,
-    new_name: Option<String>,
-    new_uri: Option<String>,
+    attribute: Option<Attribute>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl UpdateCollectionV1Builder {
+impl ExtendCollectionAtrributesPluginV1Builder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -154,20 +138,10 @@ impl UpdateCollectionV1Builder {
         self
     }
     /// `[optional account]`
-    /// The update authority or update authority delegate of the asset
+    /// The owner or delegate of the asset
     #[inline(always)]
     pub fn authority(&mut self, authority: Option<solana_program::pubkey::Pubkey>) -> &mut Self {
         self.authority = authority;
-        self
-    }
-    /// `[optional account]`
-    /// The new update authority of the asset
-    #[inline(always)]
-    pub fn new_update_authority(
-        &mut self,
-        new_update_authority: Option<solana_program::pubkey::Pubkey>,
-    ) -> &mut Self {
-        self.new_update_authority = new_update_authority;
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
@@ -187,16 +161,9 @@ impl UpdateCollectionV1Builder {
         self.log_wrapper = log_wrapper;
         self
     }
-    /// `[optional argument]`
     #[inline(always)]
-    pub fn new_name(&mut self, new_name: String) -> &mut Self {
-        self.new_name = Some(new_name);
-        self
-    }
-    /// `[optional argument]`
-    #[inline(always)]
-    pub fn new_uri(&mut self, new_uri: String) -> &mut Self {
-        self.new_uri = Some(new_uri);
+    pub fn attribute(&mut self, attribute: Attribute) -> &mut Self {
+        self.attribute = Some(attribute);
         self
     }
     /// Add an aditional account to the instruction.
@@ -219,73 +186,66 @@ impl UpdateCollectionV1Builder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = UpdateCollectionV1 {
+        let accounts = ExtendCollectionAtrributesPluginV1 {
             collection: self.collection.expect("collection is not set"),
             payer: self.payer.expect("payer is not set"),
             authority: self.authority,
-            new_update_authority: self.new_update_authority,
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
             log_wrapper: self.log_wrapper,
         };
-        let args = UpdateCollectionV1InstructionArgs {
-            new_name: self.new_name.clone(),
-            new_uri: self.new_uri.clone(),
+        let args = ExtendCollectionAtrributesPluginV1InstructionArgs {
+            attribute: self.attribute.clone().expect("attribute is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `update_collection_v1` CPI accounts.
-pub struct UpdateCollectionV1CpiAccounts<'a, 'b> {
+/// `extend_collection_atrributes_plugin_v1` CPI accounts.
+pub struct ExtendCollectionAtrributesPluginV1CpiAccounts<'a, 'b> {
     /// The address of the asset
     pub collection: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account paying for the storage fees
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The update authority or update authority delegate of the asset
+    /// The owner or delegate of the asset
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// The new update authority of the asset
-    pub new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// The system program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The SPL Noop Program
     pub log_wrapper: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 }
 
-/// `update_collection_v1` CPI instruction.
-pub struct UpdateCollectionV1Cpi<'a, 'b> {
+/// `extend_collection_atrributes_plugin_v1` CPI instruction.
+pub struct ExtendCollectionAtrributesPluginV1Cpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The address of the asset
     pub collection: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account paying for the storage fees
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The update authority or update authority delegate of the asset
+    /// The owner or delegate of the asset
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    /// The new update authority of the asset
-    pub new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// The system program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The SPL Noop Program
     pub log_wrapper: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// The arguments for the instruction.
-    pub __args: UpdateCollectionV1InstructionArgs,
+    pub __args: ExtendCollectionAtrributesPluginV1InstructionArgs,
 }
 
-impl<'a, 'b> UpdateCollectionV1Cpi<'a, 'b> {
+impl<'a, 'b> ExtendCollectionAtrributesPluginV1Cpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: UpdateCollectionV1CpiAccounts<'a, 'b>,
-        args: UpdateCollectionV1InstructionArgs,
+        accounts: ExtendCollectionAtrributesPluginV1CpiAccounts<'a, 'b>,
+        args: ExtendCollectionAtrributesPluginV1InstructionArgs,
     ) -> Self {
         Self {
             __program: program,
             collection: accounts.collection,
             payer: accounts.payer,
             authority: accounts.authority,
-            new_update_authority: accounts.new_update_authority,
             system_program: accounts.system_program,
             log_wrapper: accounts.log_wrapper,
             __args: args,
@@ -324,7 +284,7 @@ impl<'a, 'b> UpdateCollectionV1Cpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.collection.key,
             false,
@@ -337,17 +297,6 @@ impl<'a, 'b> UpdateCollectionV1Cpi<'a, 'b> {
             accounts.push(solana_program::instruction::AccountMeta::new_readonly(
                 *authority.key,
                 true,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MPL_CORE_ID,
-                false,
-            ));
-        }
-        if let Some(new_update_authority) = self.new_update_authority {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                *new_update_authority.key,
-                false,
             ));
         } else {
             accounts.push(solana_program::instruction::AccountMeta::new_readonly(
@@ -377,7 +326,7 @@ impl<'a, 'b> UpdateCollectionV1Cpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = UpdateCollectionV1InstructionData::new()
+        let mut data = ExtendCollectionAtrributesPluginV1InstructionData::new()
             .try_to_vec()
             .unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
@@ -388,15 +337,12 @@ impl<'a, 'b> UpdateCollectionV1Cpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(6 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(5 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.collection.clone());
         account_infos.push(self.payer.clone());
         if let Some(authority) = self.authority {
             account_infos.push(authority.clone());
-        }
-        if let Some(new_update_authority) = self.new_update_authority {
-            account_infos.push(new_update_authority.clone());
         }
         account_infos.push(self.system_program.clone());
         if let Some(log_wrapper) = self.log_wrapper {
@@ -414,32 +360,29 @@ impl<'a, 'b> UpdateCollectionV1Cpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `UpdateCollectionV1` via CPI.
+/// Instruction builder for `ExtendCollectionAtrributesPluginV1` via CPI.
 ///
 /// ### Accounts:
 ///
 ///   0. `[writable]` collection
 ///   1. `[writable, signer]` payer
 ///   2. `[signer, optional]` authority
-///   3. `[optional]` new_update_authority
-///   4. `[]` system_program
-///   5. `[optional]` log_wrapper
-pub struct UpdateCollectionV1CpiBuilder<'a, 'b> {
-    instruction: Box<UpdateCollectionV1CpiBuilderInstruction<'a, 'b>>,
+///   3. `[]` system_program
+///   4. `[optional]` log_wrapper
+pub struct ExtendCollectionAtrributesPluginV1CpiBuilder<'a, 'b> {
+    instruction: Box<ExtendCollectionAtrributesPluginV1CpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> UpdateCollectionV1CpiBuilder<'a, 'b> {
+impl<'a, 'b> ExtendCollectionAtrributesPluginV1CpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(UpdateCollectionV1CpiBuilderInstruction {
+        let instruction = Box::new(ExtendCollectionAtrributesPluginV1CpiBuilderInstruction {
             __program: program,
             collection: None,
             payer: None,
             authority: None,
-            new_update_authority: None,
             system_program: None,
             log_wrapper: None,
-            new_name: None,
-            new_uri: None,
+            attribute: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -460,23 +403,13 @@ impl<'a, 'b> UpdateCollectionV1CpiBuilder<'a, 'b> {
         self
     }
     /// `[optional account]`
-    /// The update authority or update authority delegate of the asset
+    /// The owner or delegate of the asset
     #[inline(always)]
     pub fn authority(
         &mut self,
         authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     ) -> &mut Self {
         self.instruction.authority = authority;
-        self
-    }
-    /// `[optional account]`
-    /// The new update authority of the asset
-    #[inline(always)]
-    pub fn new_update_authority(
-        &mut self,
-        new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    ) -> &mut Self {
-        self.instruction.new_update_authority = new_update_authority;
         self
     }
     /// The system program
@@ -498,16 +431,9 @@ impl<'a, 'b> UpdateCollectionV1CpiBuilder<'a, 'b> {
         self.instruction.log_wrapper = log_wrapper;
         self
     }
-    /// `[optional argument]`
     #[inline(always)]
-    pub fn new_name(&mut self, new_name: String) -> &mut Self {
-        self.instruction.new_name = Some(new_name);
-        self
-    }
-    /// `[optional argument]`
-    #[inline(always)]
-    pub fn new_uri(&mut self, new_uri: String) -> &mut Self {
-        self.instruction.new_uri = Some(new_uri);
+    pub fn attribute(&mut self, attribute: Attribute) -> &mut Self {
+        self.instruction.attribute = Some(attribute);
         self
     }
     /// Add an additional account to the instruction.
@@ -551,11 +477,14 @@ impl<'a, 'b> UpdateCollectionV1CpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let args = UpdateCollectionV1InstructionArgs {
-            new_name: self.instruction.new_name.clone(),
-            new_uri: self.instruction.new_uri.clone(),
+        let args = ExtendCollectionAtrributesPluginV1InstructionArgs {
+            attribute: self
+                .instruction
+                .attribute
+                .clone()
+                .expect("attribute is not set"),
         };
-        let instruction = UpdateCollectionV1Cpi {
+        let instruction = ExtendCollectionAtrributesPluginV1Cpi {
             __program: self.instruction.__program,
 
             collection: self.instruction.collection.expect("collection is not set"),
@@ -563,8 +492,6 @@ impl<'a, 'b> UpdateCollectionV1CpiBuilder<'a, 'b> {
             payer: self.instruction.payer.expect("payer is not set"),
 
             authority: self.instruction.authority,
-
-            new_update_authority: self.instruction.new_update_authority,
 
             system_program: self
                 .instruction
@@ -581,16 +508,14 @@ impl<'a, 'b> UpdateCollectionV1CpiBuilder<'a, 'b> {
     }
 }
 
-struct UpdateCollectionV1CpiBuilderInstruction<'a, 'b> {
+struct ExtendCollectionAtrributesPluginV1CpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     collection: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     log_wrapper: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    new_name: Option<String>,
-    new_uri: Option<String>,
+    attribute: Option<Attribute>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

@@ -113,7 +113,7 @@ pub struct TransferV1InstructionData {
 
 impl TransferV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 14 }
+        Self { discriminator: 15 }
     }
 }
 

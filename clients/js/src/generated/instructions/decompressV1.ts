@@ -73,7 +73,7 @@ export function getDecompressV1InstructionDataSerializer(): Serializer<
       ],
       { description: 'DecompressV1InstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 18 })
+    (value) => ({ ...value, discriminator: 19 })
   ) as Serializer<DecompressV1InstructionDataArgs, DecompressV1InstructionData>;
 }
 

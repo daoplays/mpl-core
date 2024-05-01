@@ -100,7 +100,7 @@ pub struct UpdateV1InstructionData {
 
 impl UpdateV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 15 }
+        Self { discriminator: 16 }
     }
 }
 

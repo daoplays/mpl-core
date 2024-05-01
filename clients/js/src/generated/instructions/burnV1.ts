@@ -75,7 +75,7 @@ export function getBurnV1InstructionDataSerializer(): Serializer<
     ),
     (value) => ({
       ...value,
-      discriminator: 12,
+      discriminator: 13,
       compressionProof: value.compressionProof ?? none(),
     })
   ) as Serializer<BurnV1InstructionDataArgs, BurnV1InstructionData>;

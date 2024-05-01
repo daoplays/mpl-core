@@ -100,7 +100,7 @@ pub struct DecompressV1InstructionData {
 
 impl DecompressV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 18 }
+        Self { discriminator: 19 }
     }
 }
 

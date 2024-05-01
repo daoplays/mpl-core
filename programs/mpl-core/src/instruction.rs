@@ -5,10 +5,10 @@ use shank::{ShankContext, ShankInstruction};
 use crate::processor::{
     AddCollectionPluginV1Args, AddPluginV1Args, ApproveCollectionPluginAuthorityV1Args,
     ApprovePluginAuthorityV1Args, BurnCollectionV1Args, BurnV1Args, CompressV1Args,
-    CreateCollectionV1Args, CreateV1Args, DecompressV1Args, RemoveCollectionPluginV1Args,
-    RemovePluginV1Args, RevokeCollectionPluginAuthorityV1Args, RevokePluginAuthorityV1Args,
-    TransferV1Args, UpdateCollectionPluginV1Args, UpdateCollectionV1Args, UpdatePluginV1Args,
-    UpdateV1Args,
+    CreateCollectionV1Args, CreateV1Args, DecompressV1Args, ExtendCollectionAttributesPluginV1Args,
+    RemoveCollectionPluginV1Args, RemovePluginV1Args, RevokeCollectionPluginAuthorityV1Args,
+    RevokePluginAuthorityV1Args, TransferV1Args, UpdateCollectionPluginV1Args,
+    UpdateCollectionV1Args, UpdatePluginV1Args, UpdateV1Args,
 };
 
 /// Instructions supported by the mpl-core program.
@@ -85,6 +85,14 @@ pub(crate) enum MplAssetInstruction {
     #[account(3, name="system_program", desc = "The system program")]
     #[account(4, optional, name="log_wrapper", desc = "The SPL Noop Program")]
     UpdateCollectionPluginV1(UpdateCollectionPluginV1Args),
+
+    /// Extend the attributes plugin of an mpl-core Collection.
+    #[account(0, writable, name="collection", desc = "The address of the asset")]
+    #[account(1, writable, signer, name="payer", desc = "The account paying for the storage fees")]
+    #[account(2, optional, signer, name="authority", desc = "The owner or delegate of the asset")]
+    #[account(3, name="system_program", desc = "The system program")]
+    #[account(4, optional, name="log_wrapper", desc = "The SPL Noop Program")]
+    ExtendCollectionAtrributesPluginV1(ExtendCollectionAttributesPluginV1Args),
 
     /// Approve an authority to an mpl-core plugin.
     #[account(0, writable, name="asset", desc = "The address of the asset")]
