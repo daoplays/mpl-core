@@ -107,7 +107,7 @@ pub struct BurnV1InstructionData {
 
 impl BurnV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 13 }
+        Self { discriminator: 14 }
     }
 }
 

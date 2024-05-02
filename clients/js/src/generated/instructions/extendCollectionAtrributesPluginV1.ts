@@ -67,7 +67,7 @@ export function getExtendCollectionAtrributesPluginV1InstructionDataSerializer()
       ],
       { description: 'ExtendCollectionAtrributesPluginV1InstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 8 })
+    (value) => ({ ...value, discriminator: 9 })
   ) as Serializer<
     ExtendCollectionAtrributesPluginV1InstructionDataArgs,
     ExtendCollectionAtrributesPluginV1InstructionData

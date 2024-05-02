@@ -91,7 +91,7 @@ pub struct ExtendCollectionAtrributesPluginV1InstructionData {
 
 impl ExtendCollectionAtrributesPluginV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 8 }
+        Self { discriminator: 9 }
     }
 }
 

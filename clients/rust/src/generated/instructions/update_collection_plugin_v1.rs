@@ -91,7 +91,7 @@ pub struct UpdateCollectionPluginV1InstructionData {
 
 impl UpdateCollectionPluginV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 7 }
+        Self { discriminator: 8 }
     }
 }
 

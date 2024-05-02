@@ -67,7 +67,7 @@ export function getRevokeCollectionPluginAuthorityV1InstructionDataSerializer():
       ],
       { description: 'RevokeCollectionPluginAuthorityV1InstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 12 })
+    (value) => ({ ...value, discriminator: 13 })
   ) as Serializer<
     RevokeCollectionPluginAuthorityV1InstructionDataArgs,
     RevokeCollectionPluginAuthorityV1InstructionData

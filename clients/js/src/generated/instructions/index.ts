@@ -17,6 +17,7 @@ export * from './compressV1';
 export * from './createCollectionV1';
 export * from './createV1';
 export * from './decompressV1';
+export * from './extendAtrributesPluginV1';
 export * from './extendCollectionAtrributesPluginV1';
 export * from './removeCollectionPluginV1';
 export * from './removePluginV1';

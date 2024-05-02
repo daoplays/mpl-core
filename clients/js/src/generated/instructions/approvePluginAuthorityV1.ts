@@ -79,7 +79,7 @@ export function getApprovePluginAuthorityV1InstructionDataSerializer(): Serializ
       ],
       { description: 'ApprovePluginAuthorityV1InstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 9 })
+    (value) => ({ ...value, discriminator: 10 })
   ) as Serializer<
     ApprovePluginAuthorityV1InstructionDataArgs,
     ApprovePluginAuthorityV1InstructionData

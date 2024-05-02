@@ -77,6 +77,10 @@ pub fn process_instruction<'a>(
             msg!("Instruction: UpdatePlugin");
             update_plugin(accounts, args)
         }
+        MplAssetInstruction::ExtendAtrributesPluginV1(args) => {
+            msg!("Instruction: ExtendAtrributesPluginV1");
+            extend_atrributes_plugin(accounts, args)
+        }
         MplAssetInstruction::UpdateCollectionPluginV1(args) => {
             msg!("Instruction: UpdateCollectionPlugin");
             update_collection_plugin(accounts, args)

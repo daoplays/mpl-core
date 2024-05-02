@@ -103,7 +103,7 @@ pub struct UpdateCollectionV1InstructionData {
 
 impl UpdateCollectionV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 17 }
+        Self { discriminator: 18 }
     }
 }
 
