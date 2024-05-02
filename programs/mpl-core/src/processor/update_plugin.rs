@@ -6,12 +6,15 @@ use solana_program::{
 
 use crate::{
     error::MplCoreError,
-    instruction::accounts::{UpdateCollectionPluginV1Accounts, UpdatePluginV1Accounts},
-    plugins::{Plugin, PluginType, RegistryRecord},
+    instruction::accounts::{
+        ExtendAtrributesPluginV1Accounts, ExtendCollectionAtrributesPluginV1Accounts,
+        UpdateCollectionPluginV1Accounts, UpdatePluginV1Accounts,
+    },
+    plugins::{Attribute, Attributes, Plugin, PluginType, RegistryRecord},
     state::{AssetV1, CollectionV1, DataBlob, Key, SolanaAccount},
     utils::{
-        load_key, resize_or_reallocate_account, resolve_authority, validate_asset_permissions,
-        validate_collection_permissions,
+        fetch_core_data, load_key, resize_or_reallocate_account, resolve_authority,
+        validate_asset_permissions, validate_collection_permissions,
     },
 };
 
@@ -152,6 +155,80 @@ pub(crate) fn update_plugin<'a>(
 
 #[repr(C)]
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Eq, Debug, Clone)]
+pub(crate) struct ExtendAttributesPluginV1Args {
+    pub attribute: Attribute,
+}
+
+pub(crate) fn extend_atrributes_plugin<'a>(
+    accounts: &'a [AccountInfo<'a>],
+    args: ExtendAttributesPluginV1Args,
+) -> ProgramResult {
+    // Accounts.
+    let ctx = ExtendAtrributesPluginV1Accounts::context(accounts)?;
+
+    // Guards.
+    assert_signer(ctx.accounts.payer)?;
+    let _authority = resolve_authority(ctx.accounts.payer, ctx.accounts.authority)?;
+
+    if ctx.accounts.system_program.key != &solana_program::system_program::ID {
+        return Err(MplCoreError::InvalidSystemProgram.into());
+    }
+
+    if let Some(log_wrapper) = ctx.accounts.log_wrapper {
+        if log_wrapper.key != &spl_noop::ID {
+            return Err(MplCoreError::InvalidLogWrapperProgram.into());
+        }
+    }
+
+    let (_asset, _plugin_header, plugin_registry) = fetch_core_data::<AssetV1>(ctx.accounts.asset)?;
+
+    let plugin_registry = plugin_registry.ok_or(MplCoreError::PluginsNotInitialized)?;
+
+    let plugin_registry_clone = plugin_registry.clone();
+    let plugin_type: PluginType = PluginType::Attributes;
+    let registry_record = plugin_registry_clone
+        .registry
+        .iter()
+        .find(|record| record.plugin_type == plugin_type)
+        .ok_or(MplCoreError::PluginNotFound)?;
+
+    let plugin = Plugin::load(ctx.accounts.asset, registry_record.offset)?;
+
+    let attributes = match plugin {
+        Plugin::Attributes(attributes) => Some(attributes),
+        _ => None,
+    };
+
+    let mut attributes = attributes.ok_or(MplCoreError::PluginsNotInitialized)?;
+
+    let mut exists = false;
+    for attribute in attributes.attribute_list.iter_mut() {
+        if *attribute.key == args.attribute.key {
+            attribute.value.replace_range(.., &args.attribute.value);
+            exists = true;
+            break;
+        }
+    }
+    if !exists {
+        attributes.attribute_list.push(args.attribute);
+    }
+
+    let updated_plugin = Plugin::Attributes(Attributes {
+        attribute_list: attributes.attribute_list,
+    });
+
+    update_plugin(
+        accounts,
+        UpdatePluginV1Args {
+            plugin: updated_plugin,
+        },
+    )?;
+
+    Ok(())
+}
+
+#[repr(C)]
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Eq, Debug, Clone)]
 pub(crate) struct UpdateCollectionPluginV1Args {
     pub plugin: Plugin,
 }
@@ -274,6 +351,81 @@ pub(crate) fn update_collection_plugin<'a>(
         .save(ctx.accounts.collection, registry_record.offset)?;
 
     process_update_plugin()
+}
+
+#[repr(C)]
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Eq, Debug, Clone)]
+pub(crate) struct ExtendCollectionAttributesPluginV1Args {
+    pub attribute: Attribute,
+}
+
+pub(crate) fn extend_collection_atrributes_plugin<'a>(
+    accounts: &'a [AccountInfo<'a>],
+    args: ExtendCollectionAttributesPluginV1Args,
+) -> ProgramResult {
+    // Accounts.
+    let ctx = ExtendCollectionAtrributesPluginV1Accounts::context(accounts)?;
+
+    // Guards.
+    assert_signer(ctx.accounts.payer)?;
+    let _authority = resolve_authority(ctx.accounts.payer, ctx.accounts.authority)?;
+
+    if ctx.accounts.system_program.key != &solana_program::system_program::ID {
+        return Err(MplCoreError::InvalidSystemProgram.into());
+    }
+
+    if let Some(log_wrapper) = ctx.accounts.log_wrapper {
+        if log_wrapper.key != &spl_noop::ID {
+            return Err(MplCoreError::InvalidLogWrapperProgram.into());
+        }
+    }
+
+    let (_collection, _plugin_header, plugin_registry) =
+        fetch_core_data::<CollectionV1>(ctx.accounts.collection)?;
+
+    let plugin_registry = plugin_registry.ok_or(MplCoreError::PluginsNotInitialized)?;
+
+    let plugin_registry_clone = plugin_registry.clone();
+    let plugin_type: PluginType = PluginType::Attributes;
+    let registry_record = plugin_registry_clone
+        .registry
+        .iter()
+        .find(|record| record.plugin_type == plugin_type)
+        .ok_or(MplCoreError::PluginNotFound)?;
+
+    let plugin = Plugin::load(ctx.accounts.collection, registry_record.offset)?;
+
+    let attributes = match plugin {
+        Plugin::Attributes(attributes) => Some(attributes),
+        _ => None,
+    };
+
+    let mut attributes = attributes.ok_or(MplCoreError::PluginsNotInitialized)?;
+
+    let mut exists = false;
+    for attribute in attributes.attribute_list.iter_mut() {
+        if *attribute.key == args.attribute.key {
+            attribute.value.replace_range(.., &args.attribute.value);
+            exists = true;
+            break;
+        }
+    }
+    if !exists {
+        attributes.attribute_list.push(args.attribute);
+    }
+
+    let updated_plugin = Plugin::Attributes(Attributes {
+        attribute_list: attributes.attribute_list,
+    });
+
+    update_collection_plugin(
+        accounts,
+        UpdateCollectionPluginV1Args {
+            plugin: updated_plugin,
+        },
+    )?;
+
+    Ok(())
 }
 
 //TODO

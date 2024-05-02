@@ -77,7 +77,7 @@ export function getApproveCollectionPluginAuthorityV1InstructionDataSerializer()
       ],
       { description: 'ApproveCollectionPluginAuthorityV1InstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 9 })
+    (value) => ({ ...value, discriminator: 11 })
   ) as Serializer<
     ApproveCollectionPluginAuthorityV1InstructionDataArgs,
     ApproveCollectionPluginAuthorityV1InstructionData

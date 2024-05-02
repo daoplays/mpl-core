@@ -5,16 +5,14 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
-use crate::generated::types::CompressionProof;
+use crate::generated::types::Attribute;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct DecompressV1 {
+pub struct ExtendCollectionAtrributesPluginV1 {
     /// The address of the asset
-    pub asset: solana_program::pubkey::Pubkey,
-    /// The collection to which the asset belongs
-    pub collection: Option<solana_program::pubkey::Pubkey>,
+    pub collection: solana_program::pubkey::Pubkey,
     /// The account paying for the storage fees
     pub payer: solana_program::pubkey::Pubkey,
     /// The owner or delegate of the asset
@@ -25,33 +23,24 @@ pub struct DecompressV1 {
     pub log_wrapper: Option<solana_program::pubkey::Pubkey>,
 }
 
-impl DecompressV1 {
+impl ExtendCollectionAtrributesPluginV1 {
     pub fn instruction(
         &self,
-        args: DecompressV1InstructionArgs,
+        args: ExtendCollectionAtrributesPluginV1InstructionArgs,
     ) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: DecompressV1InstructionArgs,
+        args: ExtendCollectionAtrributesPluginV1InstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.asset, false,
+            self.collection,
+            false,
         ));
-        if let Some(collection) = self.collection {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                collection, false,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MPL_CORE_ID,
-                false,
-            ));
-        }
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.payer, true,
         ));
@@ -81,7 +70,9 @@ impl DecompressV1 {
             ));
         }
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = DecompressV1InstructionData::new().try_to_vec().unwrap();
+        let mut data = ExtendCollectionAtrributesPluginV1InstructionData::new()
+            .try_to_vec()
+            .unwrap();
         let mut args = args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -94,59 +85,50 @@ impl DecompressV1 {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-pub struct DecompressV1InstructionData {
+pub struct ExtendCollectionAtrributesPluginV1InstructionData {
     discriminator: u8,
 }
 
-impl DecompressV1InstructionData {
+impl ExtendCollectionAtrributesPluginV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 20 }
+        Self { discriminator: 9 }
     }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct DecompressV1InstructionArgs {
-    pub compression_proof: CompressionProof,
+pub struct ExtendCollectionAtrributesPluginV1InstructionArgs {
+    pub attribute: Attribute,
 }
 
-/// Instruction builder for `DecompressV1`.
+/// Instruction builder for `ExtendCollectionAtrributesPluginV1`.
 ///
 /// ### Accounts:
 ///
-///   0. `[writable]` asset
-///   1. `[optional]` collection
-///   2. `[writable, signer]` payer
-///   3. `[signer, optional]` authority
-///   4. `[optional]` system_program (default to `11111111111111111111111111111111`)
-///   5. `[optional]` log_wrapper
+///   0. `[writable]` collection
+///   1. `[writable, signer]` payer
+///   2. `[signer, optional]` authority
+///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
+///   4. `[optional]` log_wrapper
 #[derive(Default)]
-pub struct DecompressV1Builder {
-    asset: Option<solana_program::pubkey::Pubkey>,
+pub struct ExtendCollectionAtrributesPluginV1Builder {
     collection: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
     log_wrapper: Option<solana_program::pubkey::Pubkey>,
-    compression_proof: Option<CompressionProof>,
+    attribute: Option<Attribute>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl DecompressV1Builder {
+impl ExtendCollectionAtrributesPluginV1Builder {
     pub fn new() -> Self {
         Self::default()
     }
     /// The address of the asset
     #[inline(always)]
-    pub fn asset(&mut self, asset: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.asset = Some(asset);
-        self
-    }
-    /// `[optional account]`
-    /// The collection to which the asset belongs
-    #[inline(always)]
-    pub fn collection(&mut self, collection: Option<solana_program::pubkey::Pubkey>) -> &mut Self {
-        self.collection = collection;
+    pub fn collection(&mut self, collection: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.collection = Some(collection);
         self
     }
     /// The account paying for the storage fees
@@ -180,8 +162,8 @@ impl DecompressV1Builder {
         self
     }
     #[inline(always)]
-    pub fn compression_proof(&mut self, compression_proof: CompressionProof) -> &mut Self {
-        self.compression_proof = Some(compression_proof);
+    pub fn attribute(&mut self, attribute: Attribute) -> &mut Self {
+        self.attribute = Some(attribute);
         self
     }
     /// Add an aditional account to the instruction.
@@ -204,9 +186,8 @@ impl DecompressV1Builder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = DecompressV1 {
-            asset: self.asset.expect("asset is not set"),
-            collection: self.collection,
+        let accounts = ExtendCollectionAtrributesPluginV1 {
+            collection: self.collection.expect("collection is not set"),
             payer: self.payer.expect("payer is not set"),
             authority: self.authority,
             system_program: self
@@ -214,23 +195,18 @@ impl DecompressV1Builder {
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
             log_wrapper: self.log_wrapper,
         };
-        let args = DecompressV1InstructionArgs {
-            compression_proof: self
-                .compression_proof
-                .clone()
-                .expect("compression_proof is not set"),
+        let args = ExtendCollectionAtrributesPluginV1InstructionArgs {
+            attribute: self.attribute.clone().expect("attribute is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `decompress_v1` CPI accounts.
-pub struct DecompressV1CpiAccounts<'a, 'b> {
+/// `extend_collection_atrributes_plugin_v1` CPI accounts.
+pub struct ExtendCollectionAtrributesPluginV1CpiAccounts<'a, 'b> {
     /// The address of the asset
-    pub asset: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The collection to which the asset belongs
-    pub collection: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub collection: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account paying for the storage fees
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The owner or delegate of the asset
@@ -241,14 +217,12 @@ pub struct DecompressV1CpiAccounts<'a, 'b> {
     pub log_wrapper: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 }
 
-/// `decompress_v1` CPI instruction.
-pub struct DecompressV1Cpi<'a, 'b> {
+/// `extend_collection_atrributes_plugin_v1` CPI instruction.
+pub struct ExtendCollectionAtrributesPluginV1Cpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The address of the asset
-    pub asset: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The collection to which the asset belongs
-    pub collection: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub collection: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account paying for the storage fees
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The owner or delegate of the asset
@@ -258,18 +232,17 @@ pub struct DecompressV1Cpi<'a, 'b> {
     /// The SPL Noop Program
     pub log_wrapper: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// The arguments for the instruction.
-    pub __args: DecompressV1InstructionArgs,
+    pub __args: ExtendCollectionAtrributesPluginV1InstructionArgs,
 }
 
-impl<'a, 'b> DecompressV1Cpi<'a, 'b> {
+impl<'a, 'b> ExtendCollectionAtrributesPluginV1Cpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: DecompressV1CpiAccounts<'a, 'b>,
-        args: DecompressV1InstructionArgs,
+        accounts: ExtendCollectionAtrributesPluginV1CpiAccounts<'a, 'b>,
+        args: ExtendCollectionAtrributesPluginV1InstructionArgs,
     ) -> Self {
         Self {
             __program: program,
-            asset: accounts.asset,
             collection: accounts.collection,
             payer: accounts.payer,
             authority: accounts.authority,
@@ -311,22 +284,11 @@ impl<'a, 'b> DecompressV1Cpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.asset.key,
+            *self.collection.key,
             false,
         ));
-        if let Some(collection) = self.collection {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                *collection.key,
-                false,
-            ));
-        } else {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                crate::MPL_CORE_ID,
-                false,
-            ));
-        }
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.payer.key,
             true,
@@ -364,7 +326,9 @@ impl<'a, 'b> DecompressV1Cpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = DecompressV1InstructionData::new().try_to_vec().unwrap();
+        let mut data = ExtendCollectionAtrributesPluginV1InstructionData::new()
+            .try_to_vec()
+            .unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -373,12 +337,9 @@ impl<'a, 'b> DecompressV1Cpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(6 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(5 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
-        account_infos.push(self.asset.clone());
-        if let Some(collection) = self.collection {
-            account_infos.push(collection.clone());
-        }
+        account_infos.push(self.collection.clone());
         account_infos.push(self.payer.clone());
         if let Some(authority) = self.authority {
             account_infos.push(authority.clone());
@@ -399,49 +360,40 @@ impl<'a, 'b> DecompressV1Cpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `DecompressV1` via CPI.
+/// Instruction builder for `ExtendCollectionAtrributesPluginV1` via CPI.
 ///
 /// ### Accounts:
 ///
-///   0. `[writable]` asset
-///   1. `[optional]` collection
-///   2. `[writable, signer]` payer
-///   3. `[signer, optional]` authority
-///   4. `[]` system_program
-///   5. `[optional]` log_wrapper
-pub struct DecompressV1CpiBuilder<'a, 'b> {
-    instruction: Box<DecompressV1CpiBuilderInstruction<'a, 'b>>,
+///   0. `[writable]` collection
+///   1. `[writable, signer]` payer
+///   2. `[signer, optional]` authority
+///   3. `[]` system_program
+///   4. `[optional]` log_wrapper
+pub struct ExtendCollectionAtrributesPluginV1CpiBuilder<'a, 'b> {
+    instruction: Box<ExtendCollectionAtrributesPluginV1CpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> DecompressV1CpiBuilder<'a, 'b> {
+impl<'a, 'b> ExtendCollectionAtrributesPluginV1CpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(DecompressV1CpiBuilderInstruction {
+        let instruction = Box::new(ExtendCollectionAtrributesPluginV1CpiBuilderInstruction {
             __program: program,
-            asset: None,
             collection: None,
             payer: None,
             authority: None,
             system_program: None,
             log_wrapper: None,
-            compression_proof: None,
+            attribute: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
     }
     /// The address of the asset
     #[inline(always)]
-    pub fn asset(&mut self, asset: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
-        self.instruction.asset = Some(asset);
-        self
-    }
-    /// `[optional account]`
-    /// The collection to which the asset belongs
-    #[inline(always)]
     pub fn collection(
         &mut self,
-        collection: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+        collection: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.collection = collection;
+        self.instruction.collection = Some(collection);
         self
     }
     /// The account paying for the storage fees
@@ -480,8 +432,8 @@ impl<'a, 'b> DecompressV1CpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn compression_proof(&mut self, compression_proof: CompressionProof) -> &mut Self {
-        self.instruction.compression_proof = Some(compression_proof);
+    pub fn attribute(&mut self, attribute: Attribute) -> &mut Self {
+        self.instruction.attribute = Some(attribute);
         self
     }
     /// Add an additional account to the instruction.
@@ -525,19 +477,17 @@ impl<'a, 'b> DecompressV1CpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let args = DecompressV1InstructionArgs {
-            compression_proof: self
+        let args = ExtendCollectionAtrributesPluginV1InstructionArgs {
+            attribute: self
                 .instruction
-                .compression_proof
+                .attribute
                 .clone()
-                .expect("compression_proof is not set"),
+                .expect("attribute is not set"),
         };
-        let instruction = DecompressV1Cpi {
+        let instruction = ExtendCollectionAtrributesPluginV1Cpi {
             __program: self.instruction.__program,
 
-            asset: self.instruction.asset.expect("asset is not set"),
-
-            collection: self.instruction.collection,
+            collection: self.instruction.collection.expect("collection is not set"),
 
             payer: self.instruction.payer.expect("payer is not set"),
 
@@ -558,15 +508,14 @@ impl<'a, 'b> DecompressV1CpiBuilder<'a, 'b> {
     }
 }
 
-struct DecompressV1CpiBuilderInstruction<'a, 'b> {
+struct ExtendCollectionAtrributesPluginV1CpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
-    asset: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     collection: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     log_wrapper: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    compression_proof: Option<CompressionProof>,
+    attribute: Option<Attribute>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

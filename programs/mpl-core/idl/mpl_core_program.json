@@ -461,74 +461,6 @@
       }
     },
     {
-      "name": "ExtendAtrributesPluginV1",
-      "accounts": [
-        {
-          "name": "asset",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The address of the asset"
-          ]
-        },
-        {
-          "name": "collection",
-          "isMut": true,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "The collection to which the asset belongs"
-          ]
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "The account paying for the storage fees"
-          ]
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "isOptional": true,
-          "docs": [
-            "The owner or delegate of the asset"
-          ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "The system program"
-          ]
-        },
-        {
-          "name": "logWrapper",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "The SPL Noop Program"
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "extendAttributesPluginV1Args",
-          "type": {
-            "defined": "ExtendAttributesPluginV1Args"
-          }
-        }
-      ],
-      "discriminant": {
-        "type": "u8",
-        "value": 7
-      }
-    },
-    {
       "name": "UpdateCollectionPluginV1",
       "accounts": [
         {
@@ -584,7 +516,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 8
+        "value": 7
       }
     },
     {
@@ -643,7 +575,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 9
+        "value": 8
       }
     },
     {
@@ -711,7 +643,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 10
+        "value": 9
       }
     },
     {
@@ -770,7 +702,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 11
+        "value": 10
       }
     },
     {
@@ -838,7 +770,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 12
+        "value": 11
       }
     },
     {
@@ -897,7 +829,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 13
+        "value": 12
       }
     },
     {
@@ -966,7 +898,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 14
+        "value": 13
       }
     },
     {
@@ -1017,7 +949,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 15
+        "value": 14
       }
     },
     {
@@ -1094,7 +1026,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 16
+        "value": 15
       }
     },
     {
@@ -1162,7 +1094,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 17
+        "value": 16
       }
     },
     {
@@ -1230,7 +1162,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 18
+        "value": 17
       }
     },
     {
@@ -1298,7 +1230,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 19
+        "value": 18
       }
     },
     {
@@ -1366,7 +1298,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 20
+        "value": 19
       }
     },
     {
@@ -1392,7 +1324,7 @@
       "args": [],
       "discriminant": {
         "type": "u8",
-        "value": 21
+        "value": 20
       }
     }
   ],
@@ -2114,20 +2046,6 @@
       }
     },
     {
-      "name": "ExtendAttributesPluginV1Args",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "attribute",
-            "type": {
-              "defined": "Attribute"
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "UpdateCollectionPluginV1Args",
       "type": {
         "kind": "struct",
@@ -2701,8 +2619,6 @@
   ],
   "metadata": {
     "origin": "shank",
-    "address": "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
-    "binaryVersion": "0.4.2",
-    "libVersion": "0.4.2"
+    "address": "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d"
   }
 }

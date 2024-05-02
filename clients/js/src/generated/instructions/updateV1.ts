@@ -86,7 +86,7 @@ export function getUpdateV1InstructionDataSerializer(): Serializer<
     ),
     (value) => ({
       ...value,
-      discriminator: 15,
+      discriminator: 17,
       newUpdateAuthority: value.newUpdateAuthority ?? none(),
     })
   ) as Serializer<UpdateV1InstructionDataArgs, UpdateV1InstructionData>;

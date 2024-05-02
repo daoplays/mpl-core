@@ -93,7 +93,7 @@ pub struct CompressV1InstructionData {
 
 impl CompressV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 17 }
+        Self { discriminator: 19 }
     }
 }
 

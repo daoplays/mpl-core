@@ -81,7 +81,7 @@ export function getTransferV1InstructionDataSerializer(): Serializer<
     ),
     (value) => ({
       ...value,
-      discriminator: 14,
+      discriminator: 16,
       compressionProof: value.compressionProof ?? none(),
     })
   ) as Serializer<TransferV1InstructionDataArgs, TransferV1InstructionData>;

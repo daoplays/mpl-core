@@ -103,7 +103,7 @@ pub struct ApprovePluginAuthorityV1InstructionData {
 
 impl ApprovePluginAuthorityV1InstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 8 }
+        Self { discriminator: 10 }
     }
 }
 

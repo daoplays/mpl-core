@@ -47,7 +47,7 @@ export function getCollectInstructionDataSerializer(): Serializer<
     struct<CollectInstructionData>([['discriminator', u8()]], {
       description: 'CollectInstructionData',
     }),
-    (value) => ({ ...value, discriminator: 19 })
+    (value) => ({ ...value, discriminator: 21 })
   ) as Serializer<CollectInstructionDataArgs, CollectInstructionData>;
 }
 

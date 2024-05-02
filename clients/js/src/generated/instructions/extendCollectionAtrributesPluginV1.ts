@@ -25,14 +25,13 @@ import {
   ResolvedAccountsWithIndices,
   getAccountMetasAndSigners,
 } from '../shared';
+import { Attribute, AttributeArgs, getAttributeSerializer } from '../types';
 
 // Accounts.
-export type CompressV1InstructionAccounts = {
+export type ExtendCollectionAtrributesPluginV1InstructionAccounts = {
   /** The address of the asset */
-  asset: PublicKey | Pda;
-  /** The collection to which the asset belongs */
-  collection?: PublicKey | Pda;
-  /** The account receiving the storage fees */
+  collection: PublicKey | Pda;
+  /** The account paying for the storage fees */
   payer?: Signer;
   /** The owner or delegate of the asset */
   authority?: Signer;
@@ -43,30 +42,47 @@ export type CompressV1InstructionAccounts = {
 };
 
 // Data.
-export type CompressV1InstructionData = { discriminator: number };
+export type ExtendCollectionAtrributesPluginV1InstructionData = {
+  discriminator: number;
+  attribute: Attribute;
+};
 
-export type CompressV1InstructionDataArgs = {};
+export type ExtendCollectionAtrributesPluginV1InstructionDataArgs = {
+  attribute: AttributeArgs;
+};
 
-export function getCompressV1InstructionDataSerializer(): Serializer<
-  CompressV1InstructionDataArgs,
-  CompressV1InstructionData
+export function getExtendCollectionAtrributesPluginV1InstructionDataSerializer(): Serializer<
+  ExtendCollectionAtrributesPluginV1InstructionDataArgs,
+  ExtendCollectionAtrributesPluginV1InstructionData
 > {
   return mapSerializer<
-    CompressV1InstructionDataArgs,
+    ExtendCollectionAtrributesPluginV1InstructionDataArgs,
     any,
-    CompressV1InstructionData
+    ExtendCollectionAtrributesPluginV1InstructionData
   >(
-    struct<CompressV1InstructionData>([['discriminator', u8()]], {
-      description: 'CompressV1InstructionData',
-    }),
-    (value) => ({ ...value, discriminator: 19 })
-  ) as Serializer<CompressV1InstructionDataArgs, CompressV1InstructionData>;
+    struct<ExtendCollectionAtrributesPluginV1InstructionData>(
+      [
+        ['discriminator', u8()],
+        ['attribute', getAttributeSerializer()],
+      ],
+      { description: 'ExtendCollectionAtrributesPluginV1InstructionData' }
+    ),
+    (value) => ({ ...value, discriminator: 9 })
+  ) as Serializer<
+    ExtendCollectionAtrributesPluginV1InstructionDataArgs,
+    ExtendCollectionAtrributesPluginV1InstructionData
+  >;
 }
 
+// Args.
+export type ExtendCollectionAtrributesPluginV1InstructionArgs =
+  ExtendCollectionAtrributesPluginV1InstructionDataArgs;
+
 // Instruction.
-export function compressV1(
+export function extendCollectionAtrributesPluginV1(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: CompressV1InstructionAccounts
+  input: ExtendCollectionAtrributesPluginV1InstructionAccounts &
+    ExtendCollectionAtrributesPluginV1InstructionArgs
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -76,37 +92,37 @@ export function compressV1(
 
   // Accounts.
   const resolvedAccounts = {
-    asset: {
+    collection: {
       index: 0,
       isWritable: true as boolean,
-      value: input.asset ?? null,
-    },
-    collection: {
-      index: 1,
-      isWritable: false as boolean,
       value: input.collection ?? null,
     },
     payer: {
-      index: 2,
+      index: 1,
       isWritable: true as boolean,
       value: input.payer ?? null,
     },
     authority: {
-      index: 3,
+      index: 2,
       isWritable: false as boolean,
       value: input.authority ?? null,
     },
     systemProgram: {
-      index: 4,
+      index: 3,
       isWritable: false as boolean,
       value: input.systemProgram ?? null,
     },
     logWrapper: {
-      index: 5,
+      index: 4,
       isWritable: false as boolean,
       value: input.logWrapper ?? null,
     },
   } satisfies ResolvedAccountsWithIndices;
+
+  // Arguments.
+  const resolvedArgs: ExtendCollectionAtrributesPluginV1InstructionArgs = {
+    ...input,
+  };
 
   // Default values.
   if (!resolvedAccounts.payer.value) {
@@ -133,7 +149,10 @@ export function compressV1(
   );
 
   // Data.
-  const data = getCompressV1InstructionDataSerializer().serialize({});
+  const data =
+    getExtendCollectionAtrributesPluginV1InstructionDataSerializer().serialize(
+      resolvedArgs as ExtendCollectionAtrributesPluginV1InstructionDataArgs
+    );
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

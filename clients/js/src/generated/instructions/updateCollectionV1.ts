@@ -75,7 +75,7 @@ export function getUpdateCollectionV1InstructionDataSerializer(): Serializer<
       ],
       { description: 'UpdateCollectionV1InstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 16 })
+    (value) => ({ ...value, discriminator: 18 })
   ) as Serializer<
     UpdateCollectionV1InstructionDataArgs,
     UpdateCollectionV1InstructionData

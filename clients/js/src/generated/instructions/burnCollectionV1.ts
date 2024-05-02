@@ -72,7 +72,7 @@ export function getBurnCollectionV1InstructionDataSerializer(): Serializer<
       ],
       { description: 'BurnCollectionV1InstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 13 })
+    (value) => ({ ...value, discriminator: 15 })
   ) as Serializer<
     BurnCollectionV1InstructionDataArgs,
     BurnCollectionV1InstructionData
